@@ -1,5 +1,7 @@
 module.exports = (sourceFolderPath, saveFilePath) => {
 	
+	let Path = require('path');
+	
 	let sentences = [];
 	
 	let find = (path) => {
@@ -64,12 +66,20 @@ module.exports = (sourceFolderPath, saveFilePath) => {
 	
 	let content = '';
 	
-	EACH(sentences, (sentence, i) => {
-		content += 'sentence' + i + ',"' + sentence + '"\n';
-	});
+	if (Path.extname(saveFilePath) === '.csv') {
+		EACH(sentences, (sentence, i) => {
+			content += 'SENTENCE_' + i + ',"' + sentence.replace(/"/g, '""') + '"\n';
+		});
+	} else {
+		EACH(sentences, (sentence, i) => {
+			content += sentence + '\n';
+		});
+	}
 	
 	WRITE_FILE({
 		path : saveFilePath,
 		content : content
+	}, () => {
+		console.log('추출 완료');
 	});
 };
