@@ -2,9 +2,15 @@ module.exports = (sourceFolderPath, saveFilePath) => {
 	
 	let Path = require('path');
 	
-	let sentences = [];
+	let sentenceMap = {};
 	
 	let find = (path) => {
+		
+		let sentences = sentenceMap[path];
+		
+		if (sentences === undefined) {
+			sentences = sentenceMap[path] = [];
+		}
 		
 		READ_FILE({
 			path : path,
@@ -67,12 +73,18 @@ module.exports = (sourceFolderPath, saveFilePath) => {
 	let content = '';
 	
 	if (Path.extname(saveFilePath) === '.csv') {
-		EACH(sentences, (sentence, i) => {
-			content += 'SENTENCE_' + i + ',"' + sentence.replace(/"/g, '""') + '"\n';
+		EACH(sentenceMap, (sentences, path) => {
+			EACH(sentences, (sentence, i) => {
+				content += Path.basename(path, Path.extname(path)) + '_SENTENCE_' + i + ',"' + sentence.replace(/"/g, '""') + '"\n';
+			});
 		});
-	} else {
-		EACH(sentences, (sentence, i) => {
-			content += sentence + '\n';
+	}
+	
+	else {
+		EACH(sentenceMap, (sentences) => {
+			EACH(sentences, (sentence) => {
+				content += sentence + '\n';
+			});
 		});
 	}
 	
